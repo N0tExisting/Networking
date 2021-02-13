@@ -157,8 +157,7 @@ namespace Client {
 					}
 					HandleData(data);
 				} catch (Exception e) {
-
-					// throw;
+					Console.WriteLine($"Error recieving UDP data:\n{e}");
 				}
 			}
 			private void HandleData (byte[] data) {
@@ -177,6 +176,7 @@ namespace Client {
 		private void Init () {
 			Handlers = new Dictionary<int, PacketHandler>();
 			Handlers.Add((int) ServerPackets.welcome, ClientHandle.WelcomeR);
+			Handlers.Add((int) ServerPackets.Message, ClientHandle.Message);
 			Console.WriteLine("Initialized Packets");
 		}
 	}

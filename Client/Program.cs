@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 
-// https://youtu.be/uh8XaC0Y5MA?list=PLXkn83W0QkfnqsK8I0RAz5AbUxfg3bOQ5&t=454
+// https://youtu.be/QajkUJeypy4?list=PLXkn83W0QkfnqsK8I0RAz5AbUxfg3bOQ5&t=576
 
 namespace Client {
 	class Program {
@@ -14,13 +15,33 @@ namespace Client {
 			Console.WriteLine("Hello World!");
 
 			isRunning = true;
-			Thread mainThead = new Thread(new ThreadStart(MainThead));
-			mainThead.Start();
+			Thread mainThread = new Thread(new ThreadStart(MainThread));
+			mainThread.Start();
+			//Time();
 
 			new Client();
 			Client.Instance.ConectToServer();
+
+			Thread textThread = new Thread(new ThreadStart(TextThread));
+			textThread.Start();
 		}
-		private static void MainThead () {
+		private static void TextThread () {
+			while (isRunning) {
+				Console.ForegroundColor = ConsoleColor.DarkYellow;
+				Console.Write($">{Name}=-> ");
+				Console.ForegroundColor = ConsoleColor.DarkBlue;
+				ClientSend.Message(Console.ReadLine());
+				Console.ResetColor();
+			}
+
+
+		}
+		public static async Task Time () {
+			await Task.Delay(1);
+			while (isRunning)
+				ClientSend.time = DateTime.Now.Ticks;
+		}
+		private static void MainThread () {
 			Console.WriteLine($"Main thead started. Running at {TPS} ticks per second");
 			var time = DateTime.Now.AddMilliseconds(DeltaT);
 			int oldTPS = TPS;

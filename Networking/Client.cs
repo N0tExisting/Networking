@@ -7,8 +7,8 @@ using System.Text;
 namespace Server {
 	class Client {
 		public static int dataBufferSize = 4096;
-
 		public TCP tcp;
+		public UDP udp;
 		public int id;
 		public string name;
 		public bool used;
@@ -16,6 +16,7 @@ namespace Server {
 		public Client (int id) {
 			this.id = id;
 			tcp = new TCP(id);
+			udp = new UDP(id);
 		}
 
 		public class TCP {
@@ -96,6 +97,29 @@ namespace Server {
 					return true;
 				else
 					return false;
+			}
+		}
+		public class UDP {
+			public IPEndPoint endPoint;
+			private int id;
+			public UDP (int id) {
+				this.id = id;
+			}
+			public void Connect (IPEndPoint endPoint) {
+				this.endPoint = endPoint;
+			}
+			public void SendData(Packet packet) {
+				Server.SendUdpData(endPoint, packet);
+			}
+			public void HandleData (Packet packet) {
+				int pLenght = packet.ReadInt();
+				byte[] pBytes = packet.ToArray();
+				ThreadManager.ExecuteOnMainThread(() => {
+					using (Packet p = new Packet(pBytes)) {
+						int PID = packet.ReadInt();
+						Server.Managers[PID](id, p);
+					}
+				});
 			}
 		}
 	}

@@ -24,5 +24,14 @@ namespace Client {
 				ClientSend.WelcomeRecS(true);
 			}
 		}
+		public static void Message (Packet p) {
+			string name = p.ReadString();
+			string msg = p.ReadString();
+			Console.ForegroundColor = ConsoleColor.Yellow;
+			Console.Write($">{name}=-> ");
+			Console.ForegroundColor = ConsoleColor.Blue;
+			Console.WriteLine(msg);
+			Console.ResetColor();
+		}
 	}
 }

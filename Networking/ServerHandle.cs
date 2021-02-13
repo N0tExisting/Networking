@@ -26,5 +26,16 @@ namespace Server {
 			Console.WriteLine($"Client {from}({Server.clients[from].tcp.socket.Client.RemoteEndPoint})" +
 				$"conected succesfuly and is named: \'{Name}\'");
 		}
+		public static void Message (int from, Packet packet) {
+			string msg = packet.ReadString();
+			if (string.IsNullOrWhiteSpace(msg)) return;
+			msg = msg.Trim();
+			Console.Write(from);
+			Console.ForegroundColor = ConsoleColor.Yellow;
+			Console.Write($">{Server.clients[from].name}=-> ");
+			Console.ForegroundColor = ConsoleColor.Blue;
+			Console.WriteLine(msg);
+			ServerSend.Text(from, msg);
+		}
 	}
 }
