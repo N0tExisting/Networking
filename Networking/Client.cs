@@ -8,7 +8,7 @@ namespace Server {
 	class Client {
 		public static int dataBufferSize = 4096;
 		public TCP tcp;
-		public UDP udp;
+		//public UDP udp;
 		public int id;
 		public string name;
 		public bool used;
@@ -16,7 +16,7 @@ namespace Server {
 		public Client (int id) {
 			this.id = id;
 			tcp = new TCP(id);
-			udp = new UDP(id);
+			//udp = new UDP(id);
 		}
 
 		public class TCP {
@@ -48,41 +48,45 @@ namespace Server {
 						stream.BeginWrite(packet.ToArray(), 0, packet.Length(), null, null);
 					}
 				} catch (Exception e) {
-					Console.WriteLine($"Error sending data to player {id} via TCP: {e}");
+					Console.WriteLine($"Error sending data to client {id} via TCP: {e}");
 				}
 			}
 			private void RecieveCallback(IAsyncResult res) {
 				try {
+					Console.Write($"Client {id} sent ");
 					int byteLenght = stream.EndRead(res);
 					if (byteLenght <= 0)
 						return;
 					byte[] data = new byte[byteLenght];
 					Array.Copy(data, buffer, byteLenght);
 
-					recievedData.Reset(handleData(data));
+					recievedData.Reset(HandleData(data));
 
 					stream.BeginRead(buffer, 0, dataBufferSize, new AsyncCallback(RecieveCallback), null);
 				} catch (Exception e) {
-					Console.WriteLine($"Error recieving TCP data:\n{e}");
 					if (e.ToString().Contains("Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host")) {
 						this.socket = null;
-					}
-					//throw;
+						Console.WriteLine($"Client {Server.clients[id].name} (ID: {id}) disconected");
+					} else
+						Console.WriteLine($"Error recieving TCP data:\n{e}");
 				}
 			}
-			private bool handleData (byte[] data) {
+			private bool HandleData (byte[] data) {
 				int pLenght = 0;
 				recievedData.SetBytes(data);
 				if (recievedData.UnreadLength() >= 4) {
 					pLenght = recievedData.ReadInt();
-					if (pLenght <= 0)
+					if (pLenght <= 0) {
+						Console.WriteLine($"something invalid.");
 						return true;
+					}
 				}
 				while (pLenght > 0 && pLenght <= recievedData.UnreadLength()) {
 					byte[] pBytes = recievedData.ReadBytes(pLenght);
 					ThreadManager.ExecuteOnMainThread(() => {
 						using (Packet P = new Packet(pBytes)) {
 							int PID = P.ReadInt();
+							Console.WriteLine($"a Packet with an id of: {PID}.");
 							Server.Managers[PID](id, P);
 						}
 					});
@@ -99,28 +103,28 @@ namespace Server {
 					return false;
 			}
 		}
-		public class UDP {
-			public IPEndPoint endPoint;
-			private int id;
-			public UDP (int id) {
-				this.id = id;
-			}
-			public void Connect (IPEndPoint endPoint) {
-				this.endPoint = endPoint;
-			}
-			public void SendData(Packet packet) {
-				Server.SendUdpData(endPoint, packet);
-			}
-			public void HandleData (Packet packet) {
-				int pLenght = packet.ReadInt();
-				byte[] pBytes = packet.ToArray();
-				ThreadManager.ExecuteOnMainThread(() => {
-					using (Packet p = new Packet(pBytes)) {
-						int PID = packet.ReadInt();
-						Server.Managers[PID](id, p);
-					}
-				});
-			}
-		}
+		//public class UDP {
+		//	public IPEndPoint endPoint;
+		//	private int id;
+		//	public UDP (int id) {
+		//		this.id = id;
+		//	}
+		//	public void Connect (IPEndPoint endPoint) {
+		//		this.endPoint = endPoint;
+		//	}
+		//	//public void SendData(Packet packet) {
+		//	//	Server.SendUdpData(endPoint, packet);
+		//	//}
+		//	public void HandleData (Packet packet) {
+		//		int pLenght = packet.ReadInt();
+		//		byte[] pBytes = packet.ToArray();
+		//		ThreadManager.ExecuteOnMainThread(() => {
+		//			using (Packet p = new Packet(pBytes)) {
+		//				int PID = packet.ReadInt();
+		//				Server.Managers[PID](id, p);
+		//			}
+		//		});
+		//	}
+		//}
 	}
 }

@@ -14,15 +14,15 @@ namespace Server {
 
 			Thread mainThead = new Thread(new ThreadStart(MainThead));
 			mainThead.Start();
-			Time();
+			//Time();
 
 			Server.Start(50, 2925);
 		}
-		public static async Task Time () {
-			await Task.Delay(1);
-			while (true)
-				ServerSend.time = DateTime.Now.Ticks;
-		}
+		//public static async Task Time () {
+		//	await Task.Delay(1);
+		//	while (true)
+		//		ServerSend.time = DateTime.Now.Ticks;
+		//}
 		private static void MainThead () {
 			Console.WriteLine($"Main thead started. Running at {TPS} ticks per second");
 			DateTime next = DateTime.Now;

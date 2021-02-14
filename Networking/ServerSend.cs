@@ -20,21 +20,21 @@ namespace Server {
 				if (i != exempt)
 					Server.clients[i].tcp.SendTcpPacket(packet);
 		}
-		public static void SendUdpData (int to, Packet packet) {
-			packet.WriteLength();
-			Server.clients[to].udp.SendData(packet);
-		}
-		public static void SendUdpDataToAll (Packet packet) {
-			packet.WriteLength();
-			for (int i = 1; i <= Server.MaxClients; i++)
-				Server.clients[i].udp.SendData(packet);
-		}
-		public static void SendUdpDataToAll (int exempt, Packet packet) {
-			packet.WriteLength();
-			for (int i = 1; i <= Server.MaxClients; i++)
-				if (i != exempt)
-					Server.clients[i].udp.SendData(packet);
-		}
+		//public static void SendUdpData (int to, Packet packet) {
+		//	packet.WriteLength();
+		//	Server.clients[to].udp.SendData(packet);
+		//}
+		//public static void SendUdpDataToAll (Packet packet) {
+		//	packet.WriteLength();
+		//	for (int i = 1; i <= Server.MaxClients; i++)
+		//		Server.clients[i].udp.SendData(packet);
+		//}
+		//public static void SendUdpDataToAll (int exempt, Packet packet) {
+		//	packet.WriteLength();
+		//	for (int i = 1; i <= Server.MaxClients; i++)
+		//		if (i != exempt)
+		//			Server.clients[i].udp.SendData(packet);
+		//}
 		public static void Welcome (int to) {
 			Packet packet = new Packet((int) ServerPackets.welcome);
 			packet.Write(to);
@@ -46,9 +46,10 @@ namespace Server {
 		}
 		public static void Text (int from, string msg) {
 			Packet packet = new Packet((int)ServerPackets.Message);
+			packet.Write(from);
 			packet.Write(Server.clients[from].name);
 			packet.Write(msg);
-			SendUdpDataToAll(from, packet);
+			SendTcpDataToAll(from, packet);
 			packet.Dispose();
 		}
 	}

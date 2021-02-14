@@ -54,7 +54,7 @@ namespace Client {
 						Console.WriteLine($"Main thead now running at {TPS} ticks per second");
 					}
 					if (time > DateTime.Now)
-						Thread.Sleep(time - DateTime.Now.AddMilliseconds(3));
+						Thread.Sleep(time - DateTime.Now.AddMilliseconds(-3));
 				}
 			}
 		}

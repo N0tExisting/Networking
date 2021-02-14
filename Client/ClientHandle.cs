@@ -12,7 +12,7 @@ namespace Client {
 			int ServerHash = packet.ReadInt();
 			int thisHash = HashCode.Combine(Client.Instance.tcp.socket.Client.RemoteEndPoint.ToString(), Client.Instance.port);
 			Console.WriteLine($"Server TPS is: {sTps}");
-			Client.Instance.udp.Conect(((IPEndPoint) Client.Instance.tcp.socket.Client.LocalEndPoint).Port);
+			//Client.Instance.udp.Conect(((IPEndPoint) Client.Instance.tcp.socket.Client.LocalEndPoint).Port);
 
 			if (ServerHash != thisHash) {
 				Console.WriteLine($"Servers Hash ({ServerHash}) was not equal to our Hash ({thisHash})");
